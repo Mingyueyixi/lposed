@@ -33,3 +33,4 @@ dependencyResolutionManagement {
 rootProject.name = "lposed"
 //include ':xposed-api2'
 include ':xposed-api2'
+include ':plugin'
