@@ -3,11 +3,13 @@ package com.lu.lposed.api2;
 import com.lu.lposed.api2.function.Consumer;
 import com.lu.lposed.api2.function.Predicate;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XposedBridge;
@@ -102,4 +104,19 @@ public class XposedHelpers2 extends XposedHelpersSuper {
         return findMethodsByExactPredicate(clazz, predicate);
     }
 
+    public static Field[] findFieldsByExactPredicate(Class<?> clazz, Predicate<Field> predicate) {
+        List<Field> result = new LinkedList<>();
+        for (Field declaredField : clazz.getDeclaredFields()) {
+            boolean match = predicate.test(declaredField);
+            if (match) {
+                declaredField.setAccessible(true);
+                result.add(declaredField);
+            }
+        }
+        return result.toArray(new Field[result.size()]);
+    }
+    public static Field[] findFieldsByExactPredicate(String className, ClassLoader classLoader, Predicate<Field> predicate) {
+        Class<?> clazz = findClassIfExists(className, classLoader);
+        return findFieldsByExactPredicate(clazz, predicate);
+    }
 }
