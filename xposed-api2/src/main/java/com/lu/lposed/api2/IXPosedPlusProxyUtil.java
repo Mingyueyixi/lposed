@@ -38,7 +38,6 @@ class IXPosedPlusProxyUtil {
                 result = method.invoke(sourcePlus, args);
             } catch (Throwable throwable) {
                 XposedHelpers2.Config.onFailed(throwable);
-                Log.i(">>>><<<<<<<<<<<", method+ "");
                 if (XposedHelpers2.Config.mOnErrorReturnFallbackFunction != null) {
                     return XposedHelpers2.Config.mOnErrorReturnFallbackFunction.apply(method, throwable);
                 }
