@@ -1,6 +1,5 @@
 package com.lu.lposed.api2;
 
-import com.lu.lposed.api2.function.Consumer;
 import com.lu.lposed.api2.function.Predicate;
 
 import java.lang.reflect.Field;
@@ -15,7 +14,12 @@ import de.robv.android.xposed.XC_MethodReplacement;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 
+
 public class XPosedPlus extends AbsXPosedPlus {
+    // 由于XposedHelpersSuper中实际使用XPosedPlus这个类本身实现，所以这个类中不能调用
+    // XposedHelpersSuper、XposedHelpers2的同名函数，否则相当于自己调用自己，造成递归死循环
+    //
+    //
     // --------------------------------------------------------------------------------
     // --------------------------------------------------------------------------------
     // --------------------------------------------------------------------------------
@@ -127,6 +131,44 @@ public class XPosedPlus extends AbsXPosedPlus {
     public Field[] findFieldsByExactPredicate(String className, ClassLoader classLoader, Predicate<Field> predicate) {
         Class<?> clazz = findClassIfExists(className, classLoader);
         return findFieldsByExactPredicate(clazz, predicate);
+    }
+
+    @Override
+    public <T> T callMethodElse(Object obj, String methodName, T fallback, Object... args) {
+        try {
+            return (T) XposedHelpers.callMethod(obj, methodName, args);
+        } catch (Throwable e) {
+        }
+        return fallback;
+    }
+
+    @Override
+    public <T> T callMethodElse(Object obj, String methodName, T fallback, Class<?>[] parameterTypes, Object... args) {
+        try {
+            return (T) XposedHelpers.callMethod(obj, methodName, parameterTypes, args);
+        } catch (Throwable e) {
+        }
+        return fallback;
+    }
+
+    @Override
+    public <T> T callStaticMethodElse(Class<?> clazz, String methodName, T fallback, Object... args) {
+        try {
+            return (T) XposedHelpers.callStaticMethod(clazz, methodName, args);
+        } catch (Exception e) {
+
+        }
+        return fallback;
+    }
+
+    @Override
+    public <T> T callStaticMethodElse(Class<?> clazz, String methodName, T fallback, Class<?>[] parameterTypes, Object... args) {
+        try {
+            return (T) XposedHelpers.callStaticMethod(clazz, methodName, parameterTypes, args);
+        } catch (Exception e) {
+
+        }
+        return fallback;
     }
 }
 
