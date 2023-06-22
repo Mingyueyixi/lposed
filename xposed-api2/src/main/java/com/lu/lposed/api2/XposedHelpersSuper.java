@@ -19,8 +19,7 @@ import de.robv.android.xposed.XC_MethodHook;
  * 代理了XPosedPlus ，而XPosedPlus代理了XposedBridge与XposedHelpers的所有方法，内部使用，用于子类覆盖继承，不提供外部使用
  */
 class XposedHelpersSuper {
-    private static final IXPosedPlus PLUS = IXPosedPlusProxyUtil.proxyXposedPlus(new XPosedPlus());
-
+    protected static IXPosedPlus PLUS = XPosedPlusProvider.get();
     public static int getXposedVersion() {
         return PLUS.getXposedVersion();
     }

@@ -44,6 +44,16 @@ public class XposedHelpers2 extends XposedHelpersSuper{
             mOnErrorReturnFallbackFunction = function;
             return this;
         }
+
+        /**
+         * Xposed函数调用是否开启动态代理模式抓取异常，默认开启
+         * @param open
+         * @return
+         */
+        public ConfigWith setCallMethodWithProxy(boolean open) {
+            XPosedPlusProvider.setPlusProxy(open);
+            return this;
+        }
     }
 
 }
