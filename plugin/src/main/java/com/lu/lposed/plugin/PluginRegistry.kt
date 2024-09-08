@@ -88,7 +88,7 @@ object PluginProviders {
 
     class DefaultFactory<E : IPlugin> : Factory<E> {
         override fun create(clazz: Class<E>): E {
-            return clazz.newInstance()
+            return clazz.getDeclaredConstructor().newInstance()
         }
     }
 }
