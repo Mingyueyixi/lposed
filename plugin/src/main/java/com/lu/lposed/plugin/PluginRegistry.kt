@@ -2,6 +2,7 @@ package com.lu.lposed.plugin
 
 import android.content.Context
 import android.util.Log
+import com.lu.lposed.plugin.PluginProviders.PluginStore
 import de.robv.android.xposed.callbacks.XC_LoadPackage
 
 /**
@@ -9,40 +10,28 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage
  */
 object PluginRegistry {
 
-    private var mPluginHandler = PluginsHandler(arrayListOf())
-
     @JvmStatic
     @SafeVarargs
     fun register(vararg clazz: Class<out IPlugin>): PluginsHandler {
         clazz.map {
-            PluginProviders.from(it, PluginProviders.DefaultFactory()).apply {
-                mPluginHandler.plugins.add(this)
-            }
+            PluginProviders.from(it)
         }
-        return mPluginHandler
+        return PluginsHandler()
     }
 
     @JvmStatic
     fun register(vararg plugin: IPlugin): PluginsHandler {
-        plugin.onEach {
-            mPluginHandler.plugins.add(it)
-        }
-        return mPluginHandler
+        PluginProviders.put(*plugin)
+        return PluginsHandler()
     }
 
-    @JvmStatic
-    fun remove(vararg plugin: IPlugin) {
-        plugin.onEach {
-            mPluginHandler.plugins.remove(it)
-        }
-    }
 }
 
-class PluginsHandler(var plugins: MutableList<IPlugin>) {
+class PluginsHandler() {
     fun handleHooks(context: Context, lpparam: XC_LoadPackage.LoadPackageParam) {
-        plugins.forEach {
+        PluginProviders.all().forEach {
             try {
-                it.handleHook(context, lpparam)
+                it?.handleHook(context, lpparam)
             } catch (e: Exception) {
                 Log.e(">>>", "plugins handleHooks", e)
             }
@@ -51,6 +40,7 @@ class PluginsHandler(var plugins: MutableList<IPlugin>) {
 }
 
 object PluginProviders {
+
 
     @JvmStatic
     fun <E : IPlugin> from(clazz: Class<E>): E {
@@ -75,6 +65,23 @@ object PluginProviders {
             }
         }
         return clazz.cast(plugin)!!
+    }
+
+    @JvmStatic
+    fun clear() {
+        PluginStore.storeMap.clear()
+    }
+
+    @JvmStatic
+    fun all(): MutableCollection<IPlugin?> {
+        return PluginStore.storeMap.values
+    }
+
+    @JvmStatic
+    fun put(vararg plugins: IPlugin) {
+        plugins.forEach {
+            PluginStore.storeMap[it.javaClass] = it
+        }
     }
 
     private object PluginStore {
