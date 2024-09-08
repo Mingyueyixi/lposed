@@ -9,18 +9,36 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage
  */
 object PluginRegistry {
 
+    private var mPluginHandler = PluginsHandler(arrayListOf())
+
     @JvmStatic
     @SafeVarargs
     fun register(vararg clazz: Class<out IPlugin>): PluginsHandler {
-        return PluginsHandler(clazz.map {
-            PluginProviders.from(it, PluginProviders.DefaultFactory())
-        })
+        clazz.map {
+            PluginProviders.from(it, PluginProviders.DefaultFactory()).apply {
+                mPluginHandler.plugins.add(this)
+            }
+        }
+        return mPluginHandler
     }
 
+    @JvmStatic
+    fun register(vararg plugin: IPlugin): PluginsHandler {
+        plugin.onEach {
+            mPluginHandler.plugins.add(it)
+        }
+        return mPluginHandler
+    }
 
+    @JvmStatic
+    fun remove(vararg plugin: IPlugin) {
+        plugin.onEach {
+            mPluginHandler.plugins.remove(it)
+        }
+    }
 }
 
-class PluginsHandler(var plugins: List<IPlugin>) {
+class PluginsHandler(var plugins: MutableList<IPlugin>) {
     fun handleHooks(context: Context, lpparam: XC_LoadPackage.LoadPackageParam) {
         plugins.forEach {
             try {
