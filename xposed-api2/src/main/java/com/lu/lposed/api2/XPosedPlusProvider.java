@@ -31,10 +31,10 @@ class XPosedPlusProvider {
     public synchronized static void setPlusProxy(boolean flag) {
         if (flag) {
             PLUS = PLUS_PROXY;
-            XposedHelpersSuper.PLUS = PLUS_PROXY;
+            XposedHelpers2.PLUS = PLUS_PROXY;
         } else {
             PLUS = PLUS_NORMAL;
-            XposedHelpersSuper.PLUS = PLUS_NORMAL;
+            XposedHelpers2.PLUS = PLUS_NORMAL;
         }
     }
 
