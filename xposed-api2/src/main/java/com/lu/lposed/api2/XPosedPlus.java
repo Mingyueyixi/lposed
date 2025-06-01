@@ -55,6 +55,28 @@ public class XPosedPlus extends AbsXPosedPlus {
     }
 
     @Override
+    public XC_MethodHook.Unhook findAndHookMethodIfExits(Class<?> clazz, String methodName, Object... parameterTypesAndCallback) {
+        modifyCallbackProxy(parameterTypesAndCallback);
+        Method method = XposedHelpers2.findMethodExactIfExists(clazz, methodName, parameterTypesAndCallback);
+        if (method != null) {
+            XC_MethodHook callback = (XC_MethodHook) parameterTypesAndCallback[parameterTypesAndCallback.length-1];
+            return XposedBridge.hookMethod(method, callback);
+        }
+        return null;
+    }
+
+    @Override
+    public XC_MethodHook.Unhook findAndHookMethodIfExits(String className, ClassLoader classLoader, String methodName, Object... parameterTypesAndCallback) {
+        modifyCallbackProxy(parameterTypesAndCallback);
+        Method method = XposedHelpers2.findMethodExactIfExists(className, classLoader, methodName, parameterTypesAndCallback);
+        if (method != null) {
+            XC_MethodHook callback = (XC_MethodHook) parameterTypesAndCallback[parameterTypesAndCallback.length-1];
+            return XposedBridge.hookMethod(method, callback);
+        }
+        return null;
+    }
+
+    @Override
     public XC_MethodHook.Unhook findAndHookConstructor(Class<?> clazz, Object... parameterTypesAndCallback) {
         modifyCallbackProxy(parameterTypesAndCallback);
         return XposedHelpers.findAndHookConstructor(clazz, parameterTypesAndCallback);
